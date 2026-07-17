@@ -29,7 +29,10 @@ jobs:
       - name: Build wheel and source distribution
         run: uv build
       - name: Smoke test the built wheel
+        shell: pwsh
         run: |
           uv venv --python ${{ matrix.python-version }} .wheel-smoke
-          uv pip install --python .wheel-smoke/Scripts/python.exe dist/*.whl
-          .wheel-smoke/Scripts/ai-brain.exe --help
+          $wheel = Get-ChildItem -Path dist -Filter *.whl | Select-Object -First 1 -ExpandProperty FullName
+          if (-not $wheel) { throw "uv build did not produce a wheel" }
+          uv pip install --python .wheel-smoke\Scripts\python.exe $wheel
+          & .\.wheel-smoke\Scripts\ai-brain.exe --help
