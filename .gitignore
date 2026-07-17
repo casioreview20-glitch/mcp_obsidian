@@ -1,5 +1,6 @@
 # Python
 .venv/
+.wheel-smoke/
 __pycache__/
 *.py[cod]
 .pytest_cache/

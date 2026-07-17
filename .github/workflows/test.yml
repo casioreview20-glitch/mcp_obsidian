@@ -28,3 +28,8 @@ jobs:
         run: uv run python -m compileall -q src tests
       - name: Build wheel and source distribution
         run: uv build
+      - name: Smoke test the built wheel
+        run: |
+          uv venv --python ${{ matrix.python-version }} .wheel-smoke
+          uv pip install --python .wheel-smoke/Scripts/python.exe dist/*.whl
+          .wheel-smoke/Scripts/ai-brain.exe --help

@@ -7,7 +7,8 @@ import os
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, Header, HTTPException, Query
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
+from fastapi.responses import JSONResponse
 import uvicorn
 
 from .brief import build_task_brief
@@ -48,6 +49,16 @@ def create_app(*, vault_root: Path | None = None, db_path: Path | None = None) -
         description="Local-only REST API for an Obsidian vault, Chroma RAG, and AI agents.",
     )
     app.state.store = store
+
+    @app.middleware("http")
+    async def reject_non_loopback_clients(request: Request, call_next):
+        client = request.client
+        if client is None or not _is_loopback_host(client.host):
+            return JSONResponse(
+                status_code=403,
+                content={"detail": "REST API only accepts loopback clients"},
+            )
+        return await call_next(request)
 
     @app.get("/health")
     def health() -> dict[str, object]:

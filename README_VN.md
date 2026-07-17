@@ -36,7 +36,7 @@ export AI_BRAIN_VAULT="C:/path/to/Your Obsidian Vault"
 uv run ai-brain-api
 ```
 
-Mặc định API chỉ bind `127.0.0.1:8765`; `0.0.0.0` bị từ chối. Nếu đặt `AI_BRAIN_TOKEN`, mọi endpoint đọc/ghi dữ liệu vault đều phải gửi header `X-Local-Token`; `/health` vẫn dùng được cho liveness check.
+Bundled API runner chỉ bind `127.0.0.1:8765`; `0.0.0.0` bị từ chối và application cũng từ chối non-loopback request clients. Không expose API qua reverse proxy hoặc port-forwarding tunnel. Nếu đặt `AI_BRAIN_TOKEN`, mọi endpoint đọc/ghi dữ liệu vault đều phải gửi header `X-Local-Token`; `/health` vẫn dùng được cho liveness check.
 
 ## Kết nối MCP
 

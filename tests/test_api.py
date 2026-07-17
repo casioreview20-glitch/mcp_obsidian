@@ -36,12 +36,27 @@ def test_run_rejects_non_loopback_host_before_creating_the_app(monkeypatch):
         api.run()
 
 
+def test_rest_api_rejects_remote_request_clients(tmp_path: Path):
+    client = TestClient(
+        create_app(vault_root=tmp_path / "vault", db_path=tmp_path / "chroma"),
+        client=("203.0.113.10", 50000),
+    )
+
+    response = client.get("/health")
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == "REST API only accepts loopback clients"
+
+
 def test_rest_api_reindexes_searches_and_blocks_path_traversal(tmp_path: Path):
     vault = tmp_path / "vault"
     note = vault / "05 - Wiki" / "AI.md"
     note.parent.mkdir(parents=True)
     note.write_text("# RAG\n\nChroma stores embeddings for relevant-note retrieval.", encoding="utf-8")
-    client = TestClient(create_app(vault_root=vault, db_path=tmp_path / "chroma"))
+    client = TestClient(
+        create_app(vault_root=vault, db_path=tmp_path / "chroma"),
+        client=("127.0.0.1", 50000),
+    )
 
     reindex = client.post("/reindex")
     search = client.get("/search", params={"q": "embedding Chroma", "limit": 3})
@@ -59,7 +74,10 @@ def test_rest_api_reindexes_searches_and_blocks_path_traversal(tmp_path: Path):
 
 def test_rest_api_requires_token_only_when_configured(tmp_path: Path, monkeypatch):
     monkeypatch.setenv("AI_BRAIN_TOKEN", "test-token")
-    client = TestClient(create_app(vault_root=tmp_path / "vault", db_path=tmp_path / "chroma"))
+    client = TestClient(
+        create_app(vault_root=tmp_path / "vault", db_path=tmp_path / "chroma"),
+        client=("127.0.0.1", 50000),
+    )
 
     assert client.post("/reindex").status_code == 401
     assert client.post("/reindex", headers={"X-Local-Token": "test-token"}).status_code == 200
@@ -71,7 +89,10 @@ def test_rest_api_requires_token_for_all_vault_data_when_configured(tmp_path: Pa
     note = vault / "05 - Wiki" / "AI.md"
     note.parent.mkdir(parents=True)
     note.write_text("# AI\n\nPrivate data.", encoding="utf-8")
-    client = TestClient(create_app(vault_root=vault, db_path=tmp_path / "chroma"))
+    client = TestClient(
+        create_app(vault_root=vault, db_path=tmp_path / "chroma"),
+        client=("127.0.0.1", 50000),
+    )
 
     assert client.get("/status").status_code == 401
     assert client.get("/search", params={"q": "private"}).status_code == 401
@@ -84,7 +105,10 @@ def test_rest_api_builds_a_cited_task_brief_within_budget(tmp_path: Path):
     note = vault / "00 - AI System" / "Workflows" / "Debug.md"
     note.parent.mkdir(parents=True)
     note.write_text("# Debug\n\nReproduce the failure, fix the root cause, and run regression tests.", encoding="utf-8")
-    client = TestClient(create_app(vault_root=vault, db_path=tmp_path / "chroma"))
+    client = TestClient(
+        create_app(vault_root=vault, db_path=tmp_path / "chroma"),
+        client=("127.0.0.1", 50000),
+    )
     client.post("/reindex")
 
     response = client.get("/brief", params={"task": "debug regression", "profile": "lean", "max_chars": 700})

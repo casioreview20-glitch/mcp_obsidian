@@ -163,7 +163,7 @@ Use a fresh vault or migrate these folders deliberately. Existing vault notes ar
 ## Security model
 
 - Markdown vault files are authoritative; Chroma is only a rebuildable derived index.
-- REST is loopback-only: `127.0.0.1`, `::1`, or `localhost`.
+- The bundled `ai-brain-api` runner only binds `127.0.0.1`, `::1`, or `localhost`; the API also rejects non-loopback request clients.
 - Optional bearer-like local token protection covers all REST endpoints that return or mutate vault data. Set it on shared machines; `/status` includes absolute local paths.
 - Chroma anonymized telemetry is explicitly disabled when the local client is created.
 - Vault reads reject traversal, internal runtime directories, unsupported extensions, and case variants of protected folders.
@@ -171,7 +171,7 @@ Use a fresh vault or migrate these folders deliberately. Existing vault notes ar
 - DOCX parsing has ZIP member, compression ratio, uncompressed size, XML node/depth, and DTD/entity controls.
 - MCP inputs have explicit size bounds; brief profiles are validated before retrieval.
 
-This is a local tool, not a multi-user network service. Keep the vault private, do not bind the API publicly, and do not commit `.env`, Chroma data, or personal vault content.
+This is a local tool, not a multi-user network service. Keep the vault private, do not expose it through a reverse proxy or port-forwarding tunnel, and do not commit `.env`, Chroma data, or personal vault content.
 
 ## Development
 
