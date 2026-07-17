@@ -1,0 +1,32 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Builds
+build/
+dist/
+*.egg-info/
+
+# Local AI Brain derived state and local configuration
+.ai-brain/
+.env
+.env.*
+!.env.example
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Generated logs and local databases
+*.log
+*.sqlite
+*.sqlite3

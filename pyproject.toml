@@ -1,0 +1,31 @@
+[project]
+name = "obsidian-ai-brain"
+version = "0.1.0"
+description = "Local, private REST API + MCP + Chroma RAG for an Obsidian AI Brain"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "chromadb>=1.0.0",
+  "fastapi>=0.115.0",
+  "mcp>=1.0.0",
+  "uvicorn[standard]>=0.30.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0"]
+
+[project.scripts]
+ai-brain = "ai_brain.cli:main"
+ai-brain-api = "ai_brain.api:run"
+ai-brain-mcp = "ai_brain.mcp_server:main"
+
+[build-system]
+requires = ["hatchling>=1.25.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ai_brain"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
